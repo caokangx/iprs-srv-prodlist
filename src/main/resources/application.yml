@@ -1,0 +1,28 @@
+server:
+  servlet:
+    context-path: /iprs
+  port: 8081
+  session: 900
+spring:
+  profiles:
+    active: dev
+  application:
+    name: iprs-doc-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+devtools:
+  restart:
+    enabled: true #
+    additional-paths: src/main/java
+    exclude: WEB-INF/**
+elasticsearch:
+  index: iprs

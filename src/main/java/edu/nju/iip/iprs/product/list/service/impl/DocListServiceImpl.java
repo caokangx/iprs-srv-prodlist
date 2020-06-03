@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import edu.nju.iip.iprs.elasticsearch.RestClientConfig;
 import edu.nju.iip.iprs.message.ApiMessage;
 import edu.nju.iip.iprs.product.list.constants.IProdListMessagesConstants;
-import edu.nju.iip.iprs.product.list.dto.ProdListQueryDto;
-import edu.nju.iip.iprs.product.list.dto.SaveDocListDto;
-import edu.nju.iip.iprs.product.list.dto.SearchDocListDto;
+import edu.nju.iip.iprs.product.list.dto.*;
 import edu.nju.iip.iprs.product.list.dto.response.DocListItemDto;
 import edu.nju.iip.iprs.product.list.dto.response.DocListResponseDto;
 import edu.nju.iip.iprs.product.list.dto.response.ProdInfoDto;
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +113,7 @@ public class DocListServiceImpl implements IDocListService {
     public ApiMessage<DocListResponseDto> searchProdList(SearchDocListDto searchDocListDto) throws RuntimeException {
 
         SearchRequest searchRequest = new SearchRequest(restClientConfig.getIndex());
-        SearchSourceBuilder searchSourceBuilder = getESQueryBuilder(searchDocListDto.getQuery());
+        SearchSourceBuilder searchSourceBuilder = getESQueryBuilder(searchDocListDto);
         searchRequest.source(searchSourceBuilder);
         SearchResponse response = new SearchResponse();
 
@@ -127,29 +126,78 @@ public class DocListServiceImpl implements IDocListService {
         SearchHit[] hits = response.getHits().getHits();
         List<DocListItemDto> docList = new ArrayList<>();
 
-        for(SearchHit hit : hits) {
+        for (SearchHit hit : hits) {
             DocListItemDto docListItem = new Gson().fromJson(hit.getSourceAsString(), DocListItemDto.class);
             docList.add(docListItem);
         }
 
-        return new ApiMessage<>(new DocListResponseDto(docList));
+        long total = response.getHits().totalHits;
+        Pagination pagination = searchDocListDto.getPagination();
+        pagination.setCount(total);
+        return new ApiMessage<>(new DocListResponseDto(docList, pagination));
     }
 
 
-    private SearchSourceBuilder getESQueryBuilder(ProdListQueryDto query) {
+    private SearchSourceBuilder getESQueryBuilder(SearchDocListDto searchDocListDto) throws RuntimeException {
+        DocListQueryDto query = searchDocListDto.getQuery();
+        Pagination pagination = searchDocListDto.getPagination();
+
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
+        // query
+        try {
+            // string 统一处理
+            addStringFieldToESQueryBuilder(boolQueryBuilder, query);
 
-        boolQueryBuilder.must(QueryBuilders.matchQuery("content", query.getContent()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("name", query.getName()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("type", query.getType()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("causeOfAction", query.getCauseOfAction()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("processing", query.getProcessing()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("litigant", query.getLitigant()));
-        boolQueryBuilder.must(QueryBuilders.matchQuery("criteria", query.getCriteria()));
+            // Date 单独处理
+            DocListQueryDateDto date = query.getPublishDate();
+            if (date != null && !date.isEmpty()) {
 
-        return searchSourceBuilder.query(boolQueryBuilder);
+                Long start = date.getStart();
+                Long end = date.getEnd();
+
+                boolQueryBuilder.must(QueryBuilders.rangeQuery("publishDate").gte(start).lte(end));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // pagination
+        Integer pageSize = pagination.getPageSize();
+        Integer pageNumber = pagination.getPageNumber();
+        Integer from, size;
+        if (pageNumber == null || pageSize == null) {
+            from = 0;
+            size = 10;
+        } else {
+            from = pageSize * (pageNumber - 1);
+            size = pageSize;
+        }
+
+        return searchSourceBuilder.query(boolQueryBuilder).from(from).size(size);
+    }
+
+    private void addStringFieldToESQueryBuilder(BoolQueryBuilder boolQueryBuilder, DocListQueryDto query) throws Exception {
+        Field[] fields = query.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            if (!field.getGenericType().toString().equals("class java.lang.String")) {
+                continue;
+            }
+            field.setAccessible(true);
+
+            String name = field.getName();
+            Object value = field.get(query);
+
+            if (value == null) {
+                continue;
+            }
+
+            String trimValue = ((String) value).trim();
+            if (!trimValue.isEmpty()) {
+                boolQueryBuilder.should(QueryBuilders.matchQuery(name, value));
+            }
+        }
     }
 
     @Override

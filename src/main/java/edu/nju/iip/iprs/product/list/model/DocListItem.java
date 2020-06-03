@@ -46,6 +46,8 @@ public class DocListItem implements Serializable {
     @Column(name = DocListsItemDbConstants.DOC_NAME_COLUMN_NAME)
     private String name;
 
+//    @Lob
+//    @Basic(fetch = FetchType.LAZY), columnDefinition = "Text"
     @Column(name = DocListsItemDbConstants.CONTENT_COLUMN_NAME)
     private String content;
 

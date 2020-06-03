@@ -20,15 +20,14 @@ import java.util.List;
  */
 public class SearchDocListDto implements Serializable
 {
-    private static final long serialVersionUID = 1L;
 
     private String guid;
 
-    private ProdListQueryDto query;
+    private DocListQueryDto query;
 
     private Pagination pagination;
 
-    public SearchDocListDto(String guid, ProdListQueryDto query, Pagination pagination, List<DocListItemDto> prods) {
+    public SearchDocListDto(String guid, DocListQueryDto query, Pagination pagination, List<DocListItemDto> prods) {
         this.guid = guid;
         this.query = query;
         this.pagination = pagination;
@@ -62,9 +61,6 @@ public class SearchDocListDto implements Serializable
         this.pagination = pagination;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
 
     public String getGuid() {
         return guid;
@@ -74,15 +70,15 @@ public class SearchDocListDto implements Serializable
         this.guid = guid;
     }
 
-    public ProdListQueryDto getQuery() {
+    public DocListQueryDto getQuery() {
         return query;
     }
 
-    public void setQuery(ProdListQueryDto query) {
+    public void setQuery(DocListQueryDto query) {
         this.query = query;
     }
 
-    public SearchDocListDto(String guid, ProdListQueryDto query) {
+    public SearchDocListDto(String guid, DocListQueryDto query) {
 
         this.guid = guid;
         this.query = query;

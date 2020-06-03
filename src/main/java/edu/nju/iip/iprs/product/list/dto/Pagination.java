@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class Pagination implements Serializable {
 
-    private Integer count;
+    private Long count;
 
     @NotNull
     private Integer pageSize;
@@ -13,11 +13,11 @@ public class Pagination implements Serializable {
     @NotNull
     private Integer pageNumber;
 
-    public Integer getCount() {
+    public Long getCount() {
         return count;
     }
 
-    public void setCount(Integer count) {
+    public void setCount(Long count) {
         this.count = count;
     }
 
@@ -40,7 +40,7 @@ public class Pagination implements Serializable {
     public Pagination() {
     }
 
-    public Pagination(Integer count, @NotNull Integer pageSize, @NotNull Integer pageNumber) {
+    public Pagination(Long count, @NotNull Integer pageSize, @NotNull Integer pageNumber) {
 
         this.count = count;
         this.pageSize = pageSize;

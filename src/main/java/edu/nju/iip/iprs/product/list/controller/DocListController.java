@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * ClassName: ValueListController Description: Spring MVC Controller for value list
  *
- * @author SAP
+ * @author NJU-IIP
  * @see
  * @since
  */
@@ -35,7 +35,7 @@ public class DocListController {
     }
 
     @PostMapping(value = "/prodlist")
-    public ResponseEntity<ApiMessage<DocListResponseDto>> searchDocList(@RequestBody SearchDocListDto searchDocListDto) throws RuntimeException {
+    public ResponseEntity<ApiMessage<DocListResponseDto>> searchDocList(@RequestBody SearchDocListDto searchDocListDto) throws Exception {
         ApiMessage<DocListResponseDto> result = docListService.searchProdList(searchDocListDto);
         return new ResponseEntity(result, HttpStatus.OK);
     }

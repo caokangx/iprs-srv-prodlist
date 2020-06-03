@@ -52,4 +52,5 @@ public class DocListResponseDto
     public DocListResponseDto(List<DocListItemDto> docList) {
         this.docList = docList;
     }
+
 }

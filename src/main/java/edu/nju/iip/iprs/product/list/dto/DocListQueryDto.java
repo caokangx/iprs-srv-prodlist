@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 
 @Component
-public class ProdListQueryDto implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class DocListQueryDto implements Serializable {
 
     private String guid;
 
@@ -21,17 +19,37 @@ public class ProdListQueryDto implements Serializable {
 
     private String processing;
 
-    private ProdListQueryDateDto date;
+    private DocListQueryDateDto publishDate;
 
     private String litigant;
 
     private String criteria;
 
-    public ProdListQueryDto() {
+    private String product;
+
+    private String court;
+
+    public String getProduct() {
+        return product;
+    }
+
+    public void setProduct(String product) {
+        this.product = product;
+    }
+
+    public String getCourt() {
+        return court;
+    }
+
+    public void setCourt(String court) {
+        this.court = court;
+    }
+
+    public DocListQueryDto() {
         super();
     }
 
-    public ProdListQueryDto(String guid, String content, String name, String type, String causeOfAction, String processing, ProdListQueryDateDto date, String litigant, String criteria) {
+    public DocListQueryDto(String guid, String content, String name, String type, String causeOfAction, String processing, DocListQueryDateDto publishDate, String litigant, String criteria) {
 
         this.guid = guid;
         this.content = content;
@@ -39,14 +57,11 @@ public class ProdListQueryDto implements Serializable {
         this.type = type;
         this.causeOfAction = causeOfAction;
         this.processing = processing;
-        this.date = date;
+        this.publishDate = publishDate;
         this.litigant = litigant;
         this.criteria = criteria;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
 
     public String getGuid() {
         return guid;
@@ -96,12 +111,12 @@ public class ProdListQueryDto implements Serializable {
         this.processing = processing;
     }
 
-    public ProdListQueryDateDto getDate() {
-        return date;
+    public DocListQueryDateDto getPublishDate() {
+        return publishDate;
     }
 
-    public void setDate(ProdListQueryDateDto date) {
-        this.date = date;
+    public void setPublishDate(DocListQueryDateDto publishDate) {
+        this.publishDate = publishDate;
     }
 
     public String getLitigant() {
@@ -118,5 +133,22 @@ public class ProdListQueryDto implements Serializable {
 
     public void setCriteria(String criteria) {
         this.criteria = criteria;
+    }
+
+    @Override
+    public String toString() {
+        return "ProdListQueryDto{" +
+                "guid='" + guid + '\'' +
+                ", content='" + content + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", causeOfAction='" + causeOfAction + '\'' +
+                ", processing='" + processing + '\'' +
+                ", publishDate=" + publishDate +
+                ", litigant='" + litigant + '\'' +
+                ", criteria='" + criteria + '\'' +
+                ", product='" + product + '\'' +
+                ", court='" + court + '\'' +
+                '}';
     }
 }
